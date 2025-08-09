@@ -3,57 +3,86 @@ import type { Metadata } from 'next';
 import Grid from '@mui/material/Grid';
 import dayjs from 'dayjs';
 
+import { ReceiptIcon } from '@phosphor-icons/react/dist/ssr/Receipt';
 import { config } from '@/config';
-import { Budget } from '@/components/dashboard/overview/budget';
 import { LatestOrders } from '@/components/dashboard/overview/latest-orders';
 import { LatestProducts } from '@/components/dashboard/overview/latest-products';
 import { Sales } from '@/components/dashboard/overview/sales';
-import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
-import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
-import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
+import { StaticsCards } from '@/components/dashboard/overview/statics-cards';
+import { AlarmIcon, UsersIcon } from '@phosphor-icons/react/dist/ssr';
 
 export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+
+type StaticCardProps = {
+  diff?: number;
+  trend: 'up' | 'down';
+  value: string;
+  title: string;
+  icon: React.ReactNode;
+  color: string
+};
+
+
+const statics: StaticCardProps[] = [
+  {
+    diff: 10,
+    trend: 'up',
+    value: "12.345",
+    title: "Clientes",
+    icon: <UsersIcon fontSize="var(--icon-fontSize-lg)" />,
+    color: 'var(--mui-palette-success-main)'
+  },
+  {
+    diff: 0.5,
+    trend: 'down',
+    value: "54.321",
+    title: "Total OS",
+    icon: <ReceiptIcon fontSize="var(--icon-fontSize-lg)" />,
+    color: 'var(--mui-palette-info-main)'
+  },
+  {
+    diff: 1,
+    trend: 'up',
+    value: "7",
+    title: "Ordens pendentes",
+    icon: <AlarmIcon fontSize="var(--icon-fontSize-lg)" />,
+    color: 'var(--mui-palette-error-main)'
+  },
+  {
+    diff: 253,
+    trend: 'up',
+    value: "R$ 532",
+    title: "Receita hoje",
+    icon: <ReceiptIcon fontSize="var(--icon-fontSize-lg)" />,
+    color: 'var(--mui-palette-primary-main)'
+  }
+];
 
 export default function Page(): React.JSX.Element {
   return (
     <Grid container spacing={3}>
-      <Grid
-        size={{
-          lg: 3,
-          sm: 6,
-          xs: 12,
-        }}
-      >
-        <Budget diff={12} trend="up" sx={{ height: '100%' }} value="$24k" />
-      </Grid>
-      <Grid
-        size={{
-          lg: 3,
-          sm: 6,
-          xs: 12,
-        }}
-      >
-        <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value="1.6k" />
-      </Grid>
-      <Grid
-        size={{
-          lg: 3,
-          sm: 6,
-          xs: 12,
-        }}
-      >
-        <TasksProgress sx={{ height: '100%' }} value={75.5} />
-      </Grid>
-      <Grid
-        size={{
-          lg: 3,
-          sm: 6,
-          xs: 12,
-        }}
-      >
-        <TotalProfit sx={{ height: '100%' }} value="$15k" />
-      </Grid>
+      {statics.map((staticItem, index) => (
+        <Grid
+          key={index}
+          size={{
+            lg: 3,
+            sm: 6,
+            xs: 12,
+          }}
+        >
+          <StaticsCards
+            diff={staticItem.diff}
+            trend={staticItem.trend}
+            sx={{ height: '100%' }}
+            value={staticItem.value}
+            title={staticItem.title}
+            icon={staticItem.icon}
+            color={staticItem.color}
+          />
+        </Grid>
+      ))}
+
       <Grid
         size={{
           lg: 8,
