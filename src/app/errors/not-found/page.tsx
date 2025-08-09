@@ -10,7 +10,7 @@ import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr/ArrowLeft';
 import { config } from '@/config';
 import { paths } from '@/paths';
 
-export const metadata = { title: `Not found | Errors | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Não encontrado | Erros | ${config.site.name}` } satisfies Metadata;
 
 export default function NotFound(): React.JSX.Element {
   return (
@@ -19,16 +19,16 @@ export default function NotFound(): React.JSX.Element {
         <Box>
           <Box
             component="img"
-            alt="Under development"
+            alt="Página não encontrada"
             src="/assets/error-404.png"
             sx={{ display: 'inline-block', height: 'auto', maxWidth: '100%', width: '400px' }}
           />
         </Box>
         <Typography variant="h3" sx={{ textAlign: 'center' }}>
-          404: The page you are looking for isn&apos;t here
+          404: A página que você procura não foi encontrada
         </Typography>
         <Typography color="text.secondary" variant="body1" sx={{ textAlign: 'center' }}>
-          You either tried some shady route or you came here by mistake. Whichever it is, try using the navigation
+          Você tentou acessar uma rota inexistente ou chegou aqui por engano. Seja qual for o caso, tente usar a navegação.
         </Typography>
         <Button
           component={RouterLink}
@@ -36,7 +36,7 @@ export default function NotFound(): React.JSX.Element {
           startIcon={<ArrowLeftIcon fontSize="var(--icon-fontSize-md)" />}
           variant="contained"
         >
-          Go back to home
+          Voltar para a página inicial
         </Button>
       </Stack>
     </Box>
