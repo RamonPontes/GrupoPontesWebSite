@@ -16,9 +16,45 @@ import { Logo } from '@/components/core/logo';
 
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
+import { Avatar, Button, ListItemIcon } from '@mui/material';
+import { SignOutIcon } from '@phosphor-icons/react/dist/ssr';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth/client';
+import { logger } from '@/lib/default-logger';
+import { useUser } from '@/hooks/use-user';
+
+const user = {
+  name: 'Sofia Rivers',
+  avatar: '/assets/avatar.png',
+  jobTitle: 'Senior Developer',
+  country: 'USA',
+  city: 'Los Angeles',
+  timezone: 'GTM-7',
+  position: 'Vendedor'
+} as const;
 
 export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
+  const { checkSession } = useUser();
+
+  const router = useRouter();
+
+  const handleSignOut = React.useCallback(async (): Promise<void> => {
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        logger.error('Sign out error', error);
+        return;
+      }
+
+      await checkSession?.();
+
+      router.refresh();
+    } catch (error) {
+      logger.error('Sign out error', error);
+    }
+  }, [checkSession, router]);
 
   return (
     <Box
@@ -54,10 +90,32 @@ export function SideNav(): React.JSX.Element {
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
-      <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
-      </Box>
+      <Stack spacing={2} sx={{ p: 3, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Avatar src={user.avatar} sx={{ height: '45px', width: '45px' }} />
+        <Box>
+          <Typography variant="h6">{user.name}</Typography>
+          <Typography variant="subtitle2" color="text.secondary">{user.position}</Typography>
+        </Box>
+      </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Stack sx={{ flex: '1 1 auto' }}>
+        <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
+          {renderNavItems({ pathname, items: navItems })}
+        </Box>
+      </Stack>
+      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Stack sx={{ p: 3, mt: 'auto' }}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleSignOut}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}
+        >
+          <SignOutIcon fontSize="var(--icon-fontSize-md)" />
+          Sair
+        </Button>
+      </Stack>
+
     </Box>
   );
 }
@@ -91,11 +149,11 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
       <Box
         {...(href
           ? {
-              component: external ? 'a' : RouterLink,
-              href,
-              target: external ? '_blank' : undefined,
-              rel: external ? 'noreferrer' : undefined,
-            }
+            component: external ? 'a' : RouterLink,
+            href,
+            target: external ? '_blank' : undefined,
+            rel: external ? 'noreferrer' : undefined,
+          }
           : { role: 'button' })}
         sx={{
           alignItems: 'center',

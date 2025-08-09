@@ -15,8 +15,15 @@ import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
 
+
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
+import { Avatar, Button } from '@mui/material';
+import { SignOutIcon } from '@phosphor-icons/react/dist/ssr';
+import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth/client';
+import { logger } from '@/lib/default-logger';
+import { useUser } from '@/hooks/use-user';
 
 export interface MobileNavProps {
   onClose?: () => void;
@@ -26,6 +33,32 @@ export interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
+  const { checkSession } = useUser();
+  const router = useRouter();
+
+  const handleSignOut = React.useCallback(async (): Promise<void> => {
+    try {
+      const { error } = await authClient.signOut();
+      if (error) {
+        logger.error('Sign out error', error);
+        return;
+      }
+      await checkSession?.();
+      router.refresh();
+    } catch (error) {
+      logger.error('Sign out error', error);
+    }
+  }, [checkSession, router]);
+
+  const user = {
+    name: 'Sofia Rivers',
+    avatar: '/assets/avatar.png',
+    jobTitle: 'Senior Developer',
+    country: 'USA',
+    city: 'Los Angeles',
+    timezone: 'GTM-7',
+    position: 'Vendedor',
+  } as const;
 
   return (
     <Drawer
@@ -59,26 +92,13 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
           <Logo color="light" height={32} width={122} />
         </Box>
-        <Box
-          sx={{
-            alignItems: 'center',
-            backgroundColor: 'var(--mui-palette-neutral-950)',
-            border: '1px solid var(--mui-palette-neutral-700)',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            display: 'flex',
-            p: '4px 12px',
-          }}
-        >
-          <Box sx={{ flex: '1 1 auto' }}>
-            <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-              Workspace
-            </Typography>
-            <Typography color="inherit" variant="subtitle1">
-              Devias
-            </Typography>
-          </Box>
-          <CaretUpDownIcon />
+      </Stack>
+      <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Stack spacing={2} sx={{ p: 3, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+        <Avatar src={user.avatar} sx={{ height: '45px', width: '45px' }} />
+        <Box>
+          <Typography variant="h6">{user.name}</Typography>
+          <Typography variant="subtitle2" color="text.secondary">{user.position}</Typography>
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
@@ -86,6 +106,17 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         {renderNavItems({ pathname, items: navItems })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
+      <Stack sx={{ p: 3, mt: 'auto' }}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleSignOut}
+          sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}
+        >
+          <SignOutIcon fontSize="var(--icon-fontSize-md)" />
+          Sair
+        </Button>
+      </Stack>
     </Drawer>
   );
 }
