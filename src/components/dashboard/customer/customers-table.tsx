@@ -17,19 +17,13 @@ import Typography from '@mui/material/Typography';
 import dayjs from 'dayjs';
 
 import { useSelection } from '@/hooks/use-selection';
+import { Customer, CustomerContact } from '@/types/customers';
+import { EnvelopeIcon, PencilLineIcon, PhoneCallIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
+import { alignItems } from '@mui/system';
+import { Button, IconButton, OutlinedInput } from '@mui/material';
 
 function noop(): void {
   // do nothing
-}
-
-export interface Customer {
-  id: string;
-  avatar: string;
-  name: string;
-  email: string;
-  address: { city: string; state: string; country: string; street: string };
-  phone: string;
-  createdAt: Date;
 }
 
 interface CustomersTableProps {
@@ -60,24 +54,12 @@ export function CustomersTable({
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  checked={selectedAll}
-                  indeterminate={selectedSome}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      selectAll();
-                    } else {
-                      deselectAll();
-                    }
-                  }}
-                />
-              </TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Location</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Signed Up</TableCell>
+              <TableCell>Nome</TableCell>
+              <TableCell>Contato</TableCell>
+              <TableCell>CPF</TableCell>
+              <TableCell align='center'>Veículos</TableCell>
+              <TableCell align='center'>OSs</TableCell>
+              <TableCell align='center'>Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -86,30 +68,51 @@ export function CustomersTable({
 
               return (
                 <TableRow hover key={row.id} selected={isSelected}>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={(event) => {
-                        if (event.target.checked) {
-                          selectOne(row.id);
-                        } else {
-                          deselectOne(row.id);
-                        }
-                      }}
-                    />
-                  </TableCell>
                   <TableCell>
-                    <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-                      <Avatar src={row.avatar} />
+                    <Stack sx={{ display: 'flex', flexDirection: 'column', gap: '0' }} direction="row" spacing={2}>
                       <Typography variant="subtitle2">{row.name}</Typography>
+                      {row.address.city}, {row.address.state}, {row.address.country}
                     </Stack>
                   </TableCell>
-                  <TableCell>{row.email}</TableCell>
                   <TableCell>
-                    {row.address.city}, {row.address.state}, {row.address.country}
+                    {(() => {
+                      const phone = row.contacts.find((c: CustomerContact) => c.contact_type === 1);
+                      const email = row.contacts.find((c: CustomerContact) => c.contact_type !== 1);
+                      return (
+                        <>
+                          {phone && (
+                            <Stack key={phone.id} sx={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center' }}>
+                              <PhoneCallIcon fontSize="var(--icon-fontSize-md)" />
+                              {phone.value}
+                            </Stack>
+                          )}
+                          {email && (
+                            <Stack key={email.id} sx={{ display: 'flex', flexDirection: 'row', gap: '5px', alignItems: 'center' }}>
+                              <EnvelopeIcon fontSize="var(--icon-fontSize-md)" />
+                              {email.value}
+                            </Stack>
+                          )}
+                        </>
+                      );
+                    })()}
                   </TableCell>
-                  <TableCell>{row.phone}</TableCell>
-                  <TableCell>{dayjs(row.createdAt).format('MMM D, YYYY')}</TableCell>
+                  <TableCell>
+                    {row.cpf}
+                  </TableCell>
+                  <TableCell align='center'>
+                    {row.vehicles.length}
+                  </TableCell>
+                  <TableCell align='center'> 
+                    1 {/* ALterar */}
+                  </TableCell>
+                  <TableCell align='center'>
+                    <IconButton aria-label="delete" size="medium">
+                      <TrashIcon fontSize="var(--icon-fontSize-md)" />
+                    </IconButton>
+                    <IconButton aria-label="edit" size="medium">
+                      <PencilLineIcon fontSize="var(--icon-fontSize-md)" />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               );
             })}
