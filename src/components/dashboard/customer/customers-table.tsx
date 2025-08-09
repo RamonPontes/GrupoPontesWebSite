@@ -54,6 +54,7 @@ export function CustomersTable({
         <Table sx={{ minWidth: '800px' }}>
           <TableHead>
             <TableRow>
+              <TableCell>ID</TableCell>
               <TableCell>Nome</TableCell>
               <TableCell>Contato</TableCell>
               <TableCell>CPF</TableCell>
@@ -68,6 +69,11 @@ export function CustomersTable({
 
               return (
                 <TableRow hover key={row.id} selected={isSelected}>
+                  <TableCell>
+                    <Stack sx={{ display: 'flex', flexDirection: 'column', gap: '0' }} direction="row" spacing={2}>
+                      <Typography variant="subtitle2">{row.id.toString().padStart(4, '0')}</Typography>
+                    </Stack>
+                  </TableCell>
                   <TableCell>
                     <Stack sx={{ display: 'flex', flexDirection: 'column', gap: '0' }} direction="row" spacing={2}>
                       <Typography variant="subtitle2">{row.name}</Typography>
@@ -102,7 +108,7 @@ export function CustomersTable({
                   <TableCell align='center'>
                     {row.vehicles.length}
                   </TableCell>
-                  <TableCell align='center'> 
+                  <TableCell align='center'>
                     1 {/* ALterar */}
                   </TableCell>
                   <TableCell align='center'>
